@@ -8,7 +8,7 @@ require (
 	github.com/appleboy/gin-jwt/v2 v2.6.2
 	github.com/gin-gonic/gin v1.4.0
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/nocmk2/score v1.0.0
+	github.com/nocmk2/score v0.0.0-20190928035153-e0ff50d49755
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.4.0
 )
