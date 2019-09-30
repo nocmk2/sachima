@@ -17,27 +17,6 @@ type login struct {
 
 var identityKey = "id"
 
-func helloHandler(c *gin.Context) {
-	claims := jwt.ExtractClaims(c)
-	user, _ := c.Get(identityKey)
-	c.JSON(200, gin.H{
-		"userID":   claims[identityKey],
-		"userName": user.(*User).UserName,
-		"text":     "Hello World.",
-	})
-}
-
-func roleHandler(c *gin.Context) {
-	claims := jwt.ExtractClaims(c)
-	user, _ := c.Get(identityKey)
-	c.JSON(200, gin.H{
-		"userID":   claims[identityKey],
-		"userName": user.(*User).UserName,
-		"text":     "Hello World.",
-		"role":     "view",
-	})
-}
-
 // User demo
 type User struct {
 	UserName  string

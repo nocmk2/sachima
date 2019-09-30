@@ -23,6 +23,6 @@ func router(r *gin.Engine, au *jwt.GinJWTMiddleware) {
 	{
 		auth.GET("/hello", helloHandler)
 		auth.GET("/role", roleHandler)
-		auth.GET("/signup")
+		auth.GET("/signup", signupHandler)
 	}
 }
