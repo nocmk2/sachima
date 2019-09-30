@@ -27,6 +27,17 @@ func helloHandler(c *gin.Context) {
 	})
 }
 
+func roleHandler(c *gin.Context) {
+	claims := jwt.ExtractClaims(c)
+	user, _ := c.Get(identityKey)
+	c.JSON(200, gin.H{
+		"userID":   claims[identityKey],
+		"userName": user.(*User).UserName,
+		"text":     "Hello World.",
+		"role":     "view",
+	})
+}
+
 // User demo
 type User struct {
 	UserName  string
@@ -49,7 +60,7 @@ func Start() {
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "test zone",
 		Key:         []byte("secret key"),
-		Timeout:     time.Hour,
+		Timeout:     12 * time.Hour,
 		MaxRefresh:  time.Hour,
 		IdentityKey: identityKey,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
@@ -120,21 +131,7 @@ func Start() {
 		log.Fatal("JWT Error:" + err.Error())
 	}
 
-	r.POST("/login", authMiddleware.LoginHandler)
-
-	r.NoRoute(authMiddleware.MiddlewareFunc(), func(c *gin.Context) {
-		claims := jwt.ExtractClaims(c)
-		log.Printf("NoRoute claims: %#v\n", claims)
-		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
-	})
-
-	auth := r.Group("/auth")
-	// Refresh time can be longer than token timeout
-	auth.GET("/refresh_token", authMiddleware.RefreshHandler)
-	auth.Use(authMiddleware.MiddlewareFunc())
-	{
-		auth.GET("/hello", helloHandler)
-	}
+	router(r, authMiddleware)
 
 	if err := http.ListenAndServe(":"+port, r); err != nil {
 		log.Fatal(err)
