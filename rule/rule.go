@@ -24,7 +24,7 @@ func parse() {
 
 	t := gjson.GetBytes(f, "datasrc.type")
 	log.Println(t)
-	d := dur.ReadSQL("select shop_id,shop_has_negative,1PD7_pct from hawaiidb.risk_shop_grade limit 5", "hawaii")
+	d := dur.ReadSQL("select shop_id,shop_has_negative,1PD7_pct from risk_shop_grade limit 5", "hawaii")
 	log.Println("rows = ", d.Rows())
 	d.ToSQL("dx_xx", "localmysql8")
 	// res := rule.cal(d.GetRow(0))
