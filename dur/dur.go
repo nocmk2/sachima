@@ -2,6 +2,7 @@ package dur
 
 import (
 	"database/sql"
+	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -19,8 +20,53 @@ type Data struct {
 }
 
 //ReadSQL from db
-func ReadSQL(sql string, con string) Data {
-	return Data{}
+func ReadSQL(sqlstr string, con string) Data {
+	// https://github.com/go-sql-driver/mysql/wiki/Examples
+	db := readDBConfig(con)
+	defer db.Close()
+	rows, err := db.Query(sqlstr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	columns, err := rows.Columns()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	values := make([]sql.RawBytes, len(columns))
+
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	dt := map[string][]interface{}{}
+
+	for rows.Next() {
+		err := rows.Scan(scanArgs...)
+		if err != nil {
+			log.Fatal(err)
+		}
+		var value string
+
+		for i, col := range values {
+			// Here we can check if the value is nil (NULL value)
+			if col == nil {
+				value = "NULL"
+			} else {
+				value = string(col)
+			}
+			fmt.Println(columns[i], ": ", value)
+			dt[columns[i]] = append(dt[columns[i]], value)
+		}
+	}
+	// 	dt := map[string][]interface{}{
+	// 		"name":  []interface{}{"User1", "User2", "User3"},
+	// 		"age":   []interface{}{222222, 34, 87},
+	// 		"coomi": []interface{}{"er3r3r", "xxxxfefef", "feeefefe"},
+	// 	}
+
+	return Data{dt}
 }
 
 // Rows return data rows
