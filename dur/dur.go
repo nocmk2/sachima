@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 
+	// mysql driver
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/tidwall/gjson"
 )
