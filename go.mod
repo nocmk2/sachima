@@ -9,6 +9,7 @@ require (
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/nocmk2/mathinterval v0.0.0-20190916093910-d15969f133a8
 	github.com/nocmk2/score v0.0.0-20190928035153-e0ff50d49755
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.4.0

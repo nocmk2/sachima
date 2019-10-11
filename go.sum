@@ -113,6 +113,8 @@ github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJ
 github.com/modern-go/reflect2 v1.0.1 h1:9f412s+6RmYXLWZSEzVVgPGK7C2PphHj5RJrvfx9AWI=
 github.com/modern-go/reflect2 v1.0.1/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
+github.com/nocmk2/mathinterval v0.0.0-20190916093910-d15969f133a8 h1:kdyegd//P9xRKzqx0tFJsUxfehz0K6lk5sfJrPZSMhI=
+github.com/nocmk2/mathinterval v0.0.0-20190916093910-d15969f133a8/go.mod h1:MMHEpPNLh2LMufz1Z6JuFkML0waiS0kMNi+owWYm2IM=
 github.com/nocmk2/score v0.0.0-20190928035153-e0ff50d49755 h1:xJxbhFAgdzshzLWId0vjJiBDJ5pjeTMY/Zalf3Ks+5k=
 github.com/nocmk2/score v0.0.0-20190928035153-e0ff50d49755/go.mod h1:j3GJRGUkR/ep6Ez3zanJc5j4oIk6Le6AXimBVjzGMyg=
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=

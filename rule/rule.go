@@ -3,9 +3,11 @@ package main
 import (
 	"io/ioutil"
 	"log"
+	"strconv"
 	"strings"
 	"sync"
 
+	"github.com/nocmk2/mathinterval"
 	"github.com/nocmk2/sachima/dur"
 	"github.com/tidwall/gjson"
 )
@@ -45,24 +47,66 @@ func (r *Rule) lazyInit() {
 			return true
 		})
 
-		r.srcsql = "SELECT " + r.pk + "," + strings.Join(r.featureList, ",") + " FROM " + r.table + " limit 3"
+		r.srcsql = "SELECT " + r.pk + "," + strings.Join(r.featureList, ",") + " FROM " + r.table + " limit 300"
 
 	})
 }
 
+// GetScore return an int value get from feature.colname.bin
+func (r *Rule) GetScore(colname string, cell string) int64 {
+	var res int64
+	res = r.featureRaw.Get(colname + ".default").Int()
+	bin := r.featureRaw.Get(colname + ".bin") //gjson.GetBytes(r.featureRaw, colname+".bin")
+	bintype := r.featureRaw.Get(colname + ".bintype").String()
+
+	// if number
+	if bintype == "math" {
+		bin.ForEach(func(k, v gjson.Result) bool {
+			n, err := strconv.ParseFloat(cell, 64)
+			if err != nil {
+				n = 0
+			}
+			if mathinterval.Get(k.String()).Hit(n) {
+				res = v.Int()
+			}
+			return true
+		})
+	}
+
+	if bintype == "text" {
+		bin.ForEach(func(k, v gjson.Result) bool {
+			if k.String() == cell {
+				res = v.Int()
+			}
+			return true
+		})
+	}
+
+	return res
+}
+
 func (r *Rule) cal(d dur.Data) {
 	r.lazyInit()
-	// scores := make([]int, d.Rows())
+	var scores []int64
 	// r.featureList
 
 	log.Println(d)
 
 	for i := 0; i < d.Rows(); i++ {
+		var score int64
+		pk := strings.Split(r.pk, ",")
+		log.Println(pk[0], ":", d.Row(i).Col(pk[0]))
+		log.Println(pk[1], ":", d.Row(i).Col(pk[1]))
 		for _, colname := range r.featureList {
 			cell := d.Row(i).Col(colname)
-			log.Println(cell)
+			log.Println(colname, ":", cell)
+			score += r.GetScore(colname, cell)
 		}
+		log.Println("------------")
+		scores = append(scores, score)
 	}
+
+	log.Println(scores)
 
 	// d.ForEach(func(row dur.Row()) bool {
 	// 	res = 1334888
