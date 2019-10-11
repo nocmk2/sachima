@@ -2,7 +2,6 @@ package dur
 
 import (
 	"database/sql"
-	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -17,6 +16,33 @@ const dbConPath string = "../data/db.json"
 //Data struct
 type Data struct {
 	dt map[string][]interface{}
+}
+
+//Row reps one row of Data
+type Row struct {
+	dt map[string]interface{}
+}
+
+// Row return the ith row from data
+func (d *Data) Row(i int) Row {
+	oneRow := Row{make(map[string]interface{}, d.Rows())}
+	for colname := range d.dt {
+		oneRow.dt[colname] = d.dt[colname][i]
+	}
+	return oneRow
+}
+
+// Col return the name cell of the Row
+func (r Row) Col(name string) string {
+	return r.dt[name].(string)
+	// switch r.dt[name].(type) {
+	// default:
+	// 	return r.dt[name].(string)
+	// case string:
+	// 	return r.dt[name].(string)
+	// case int:
+	// 	return r.dt[name].(string)
+	// }
 }
 
 //ReadSQL from db
@@ -52,11 +78,11 @@ func ReadSQL(sqlstr string, con string) Data {
 		for i, col := range values {
 			// Here we can check if the value is nil (NULL value)
 			if col == nil {
-				value = "NULL"
+				value = ""
 			} else {
 				value = string(col)
 			}
-			fmt.Println(columns[i], ": ", value)
+			// log.Println(columns[i], ": ", value)
 			dt[columns[i]] = append(dt[columns[i]], value)
 		}
 	}
@@ -124,7 +150,7 @@ func (d *Data) ToSQL(table string, con string) {
 	// if table not exists create it
 	_, err := db.Exec("DROP TABLE IF EXISTS " + table)
 	if err == nil {
-		log.Println("Table " + table + " dropped!")
+		log.Println(con + " Table " + table + " dropped!")
 
 		stmt, err := db.Prepare(d.getCreateStmt(table))
 		defer stmt.Close()
