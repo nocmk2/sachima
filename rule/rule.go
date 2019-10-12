@@ -18,6 +18,7 @@ const jsonPath string = "../data/rule.json"
 
 //Rule read from rule.json by default
 type Rule struct {
+	catalog     gjson.Result
 	rulePath    string
 	featureRaw  gjson.Result
 	featureList []string
@@ -26,6 +27,18 @@ type Rule struct {
 	table       string
 	pk          string
 	doOnce      sync.Once
+}
+
+func (r *Rule) getFeaturesByCatalog(catalogName string) []string {
+	var res []string
+	r.featureRaw.ForEach(func(k, v gjson.Result) bool {
+		if v.Get("catalog").String() == catalogName {
+			res = append(res, k.String())
+		}
+		return true
+	})
+
+	return res
 }
 
 func (r *Rule) lazyInit() {
@@ -40,6 +53,7 @@ func (r *Rule) lazyInit() {
 		r.colName = gjson.GetBytes(f, "colname").String()
 		r.table = gjson.GetBytes(f, "datasrc.name").String()
 		r.pk = gjson.GetBytes(f, "datasrc.pk").String()
+		r.catalog = gjson.GetBytes(f, "catalog")
 
 		r.featureRaw.ForEach(func(k, v gjson.Result) bool {
 			r.featureList = append(r.featureList, k.String())
@@ -47,7 +61,7 @@ func (r *Rule) lazyInit() {
 			return true
 		})
 
-		r.srcsql = "SELECT " + r.pk + "," + strings.Join(r.featureList, ",") + " FROM " + r.table + " limit 300"
+		r.srcsql = "SELECT " + r.pk + "," + strings.Join(r.featureList, ",") + " FROM " + r.table + " limit 15"
 
 	})
 }
@@ -85,36 +99,89 @@ func (r *Rule) GetScore(colname string, cell string) int64 {
 	return res
 }
 
+// Normalize (x-Min)/(MAX-MIN)
+func Normalize(a []int64, percent float64) dur.Col {
+	len := len(a)
+	min := a[0]
+	max := a[1]
+	res := make(dur.Col, len)
+	for i := 0; i < len; i++ {
+		if a[i] < min {
+			min = a[i]
+		}
+
+		if a[i] > max {
+			max = a[i]
+		}
+	}
+
+	if min == max {
+		return res
+	}
+
+	for i := 0; i < len; i++ {
+		res[i] = percent * ((float64)(a[i]-min) / (float64)(max-min))
+	}
+
+	return res
+}
+
+// TODO: 开发ruler规则
+// TODO: 支持前置条件
 func (r *Rule) cal(d dur.Data) {
 	r.lazyInit()
-	var scores []int64
 	// r.featureList
+	var catalogList []string
+
+	r.catalog.ForEach(func(k, v gjson.Result) bool {
+		catalogName := k.String()
+		var scores []int64
+		log.Println(k, v)
+		catalogList = append(catalogList, catalogName)
+		weight := v.Get("weight").Float()
+		initScore := v.Get("init_score").Int()
+
+		for i := 0; i < d.Rows(); i++ {
+			score := initScore
+			// pk := strings.Split(r.pk, ",")
+			// log.Println(pk[0], ":", d.Row(i).Col(pk[0]))
+			// log.Println(pk[1], ":", d.Row(i).Col(pk[1]))
+			for _, colname := range r.getFeaturesByCatalog(catalogName) {
+				cell := d.Row(i).Col(colname)
+				// log.Println(colname, ":", cell)
+				score += r.GetScore(colname, cell)
+			}
+			// log.Println("------------")
+			scores = append(scores, score)
+			log.Println(score)
+		}
+
+		// log.Println(scores)
+		normScores := Normalize(scores, weight)
+
+		d.InsertCol(catalogName, dur.Col(normScores))
+
+		// d.InsertCol(k.String(), normScores)
+		log.Println("normScores", normScores)
+
+		return true
+	})
 
 	log.Println(d)
 
-	for i := 0; i < d.Rows(); i++ {
-		var score int64
-		pk := strings.Split(r.pk, ",")
-		log.Println(pk[0], ":", d.Row(i).Col(pk[0]))
-		log.Println(pk[1], ":", d.Row(i).Col(pk[1]))
-		for _, colname := range r.featureList {
-			cell := d.Row(i).Col(colname)
-			log.Println(colname, ":", cell)
-			score += r.GetScore(colname, cell)
-		}
-		log.Println("------------")
-		scores = append(scores, score)
+	col := d.Col(catalogList[0])
+	log.Println("catalogList", catalogList)
+	for i := 1; i < len(catalogList); i++ {
+		// log.Println(catalogList[i])
+		col = col.Add(d.Col(catalogList[i]))
+		// log.Println("-----------")
+		// log.Println(catalogList[i])
 	}
+	d.InsertCol(r.colName, col)
+	// log.Println(d.Rows())
+	log.Println(d)
+	// log.Println(d.Row(1).Col("GRADEX"))
 
-	log.Println(scores)
-
-	// d.ForEach(func(row dur.Row()) bool {
-	// 	res = 1334888
-	// 	scores = append(scores,res)
-	// 	return true
-	// })
-	//d.Add(scores, "dxscore")
-	// d.ToSQL("dx_shop_scores", "localmysql8")
 }
 
 func parse() {

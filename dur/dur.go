@@ -23,6 +23,48 @@ type Row struct {
 	dt map[string]interface{}
 }
 
+// Col reps one col of Data
+type Col []interface{}
+
+// NewCol ...
+// func NewCol(d interface{}) Col {
+// 	// return Col{d.([]interface{})}
+// 	switch d.(type) {
+// 	case []string:
+// 		log.Println("sssssssssssssss")
+// 		return Col{d.([]interface{})}
+// 	case []float64:
+// 		log.Println("ffffffffffffff")
+// 	case []int64:
+// 		log.Println("iiiiiiiiiiiiiiiiiiiiii")
+// 	}
+// }
+
+// Add :  Columns add return new Col
+func (c Col) Add(added Col) Col {
+	newCol := make(Col, len(c))
+	for i := 0; i < len(c); i++ {
+		// log.Println(i, "------------------+++")
+		// log.Println(c[i], added[i])
+		newCol[i] = c[i].(float64) + added[i].(float64)
+		// log.Println(newCol)
+	}
+	// log.Println("c", c)
+	// log.Println("added", added)
+	// log.Println("newCol", newCol)
+	return newCol
+}
+
+// InsertCol insert a Col []interface{} to data 在数据中插入一列
+func (d *Data) InsertCol(name string, values Col) {
+	d.dt[name] = values
+}
+
+//Col return one col of data type is Data.Col type
+func (d *Data) Col(name string) Col {
+	return d.dt[name]
+}
+
 // Row return the ith row from data
 func (d *Data) Row(i int) Row {
 	oneRow := Row{make(map[string]interface{}, d.Rows())}
@@ -95,7 +137,7 @@ func ReadSQL(sqlstr string, con string) Data {
 	return Data{dt}
 }
 
-// Rows return data rows
+// Rows return number of rows
 func (d *Data) Rows() int {
 	for _, v := range d.dt {
 		return len(v)
