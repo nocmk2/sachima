@@ -28,6 +28,7 @@ type Rule struct {
 	pk              string
 	DataTargetTable string
 	DataTargetType  string
+	RulersRaw       gjson.Result
 	doOnce          sync.Once
 }
 
@@ -58,6 +59,7 @@ func (r *Rule) lazyInit() {
 		r.CatalogRaw = gjson.GetBytes(f, "catalog")
 		r.DataTargetTable = gjson.GetBytes(f, "datatarget.table").String()
 		r.DataTargetType = gjson.GetBytes(f, "datatarget.type").String()
+		r.RulersRaw = gjson.GetBytes(f, "rulers")
 
 		r.featureRaw.ForEach(func(k, v gjson.Result) bool {
 			r.featureList = append(r.featureList, k.String())
@@ -187,17 +189,28 @@ func (r *Rule) cal(d dur.Data) {
 	resData.InsertCol(pk[0], d.Col(pk[0]))
 	resData.InsertCol(pk[1], d.Col(pk[1]))
 	// log.Println(d.Rows())
-	log.Println(resData)
 	// resData.ToSQL("dx_score_res", "localmysql8")
+	resData.InsertCol("GRADE", r.getRulerGrade(resData.Col(r.colName).Percentile()))
+	log.Println(resData)
 	resData.ToSQL(r.DataTargetTable, r.DataTargetType)
 	// log.Println(d.Row(1).Col("GRADEX"))
 
 }
 
 func (r *Rule) getRulerGrade(col dur.Col) dur.Col {
-	col.Percentile()
+	percents := col.Percentile()
+	var res dur.Col
+	for i := 0; i < col.Len(); i++ {
+		r.RulersRaw.ForEach(func(k, v gjson.Result) bool {
+			if mathinterval.Get(k.String()).Hit((percents[i]).(float64)) {
+				res = append(res, v.String())
+				return false
+			}
+			return true
+		})
+	}
 
-	return dur.Col{}
+	return res
 }
 
 func parse() {
