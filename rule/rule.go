@@ -29,6 +29,7 @@ type Rule struct {
 	DataTargetTable string
 	DataTargetType  string
 	RulersRaw       gjson.Result
+	Where           string
 	doOnce          sync.Once
 }
 
@@ -38,6 +39,16 @@ func (r *Rule) getFeaturesByCatalog(catalogName string) []string {
 		if v.Get("catalog").String() == catalogName {
 			res = append(res, k.String())
 		}
+		return true
+	})
+
+	return res
+}
+
+func (r *Rule) getFeatures() []string {
+	var res []string
+	r.featureRaw.ForEach(func(k, v gjson.Result) bool {
+		res = append(res, k.String())
 		return true
 	})
 
@@ -60,6 +71,7 @@ func (r *Rule) lazyInit() {
 		r.DataTargetTable = gjson.GetBytes(f, "datatarget.table").String()
 		r.DataTargetType = gjson.GetBytes(f, "datatarget.type").String()
 		r.RulersRaw = gjson.GetBytes(f, "rulers")
+		r.Where = gjson.GetBytes(f, "datasrc.where").String()
 
 		r.featureRaw.ForEach(func(k, v gjson.Result) bool {
 			r.featureList = append(r.featureList, k.String())
@@ -67,7 +79,7 @@ func (r *Rule) lazyInit() {
 			return true
 		})
 
-		r.srcsql = "SELECT " + r.pk + "," + strings.Join(r.featureList, ",") + " FROM " + r.table + " limit 15"
+		r.srcsql = "SELECT " + r.pk + "," + strings.Join(r.featureList, ",") + " FROM " + r.table + " " + r.Where + ""
 
 	})
 }
@@ -105,40 +117,16 @@ func (r *Rule) GetScore(colname string, cell string) int64 {
 	return res
 }
 
-// // Normalize (x-Min)/(MAX-MIN)
-// func Normalize(a []int64, percent float64) dur.Col {
-// 	len := len(a)
-// 	min := a[0]
-// 	max := a[1]
-// 	res := make(dur.Col, len)
-// 	for i := 0; i < len; i++ {
-// 		if a[i] < min {
-// 			min = a[i]
-// 		}
-
-// 		if a[i] > max {
-// 			max = a[i]
-// 		}
-// 	}
-
-// 	if min == max {
-// 		return res
-// 	}
-
-// 	for i := 0; i < len; i++ {
-// 		res[i] = percent * ((float64)(a[i]-min) / (float64)(max-min))
-// 	}
-
-// 	return res
-// }
-
-// TODO: 开发ruler规则
 // TODO: 支持前置条件
 func (r *Rule) cal(d dur.Data) {
 	var resData dur.Data
 	r.lazyInit()
 	// r.featureList
 	var catalogList []string
+
+	for _, colname := range r.getFeatures() {
+		resData.InsertCol(colname, make(dur.Col, d.Rows()))
+	}
 
 	r.CatalogRaw.ForEach(func(k, v gjson.Result) bool {
 		catalogName := k.String()
@@ -153,9 +141,12 @@ func (r *Rule) cal(d dur.Data) {
 			for _, colname := range r.getFeaturesByCatalog(catalogName) {
 				cell := d.Row(i).Col(colname)
 				// log.Println(colname, ":", cell)
-				score += r.GetScore(colname, cell)
+				binscore := r.GetScore(colname, cell)
+				score += binscore
+				resData.Col(colname)[i] = binscore
+				// resData.Col(colname).Row(i) = score
+				// resData.Row(i).Col(colname) = score
 			}
-			// log.Println("------------")
 			scores = append(scores, score)
 			log.Println(score)
 		}
@@ -191,6 +182,7 @@ func (r *Rule) cal(d dur.Data) {
 	// log.Println(d.Rows())
 	// resData.ToSQL("dx_score_res", "localmysql8")
 	resData.InsertCol("GRADE", r.getRulerGrade(resData.Col(r.colName).Percentile()))
+	resData.Col("xxxxll")
 	log.Println(resData)
 	resData.ToSQL(r.DataTargetTable, r.DataTargetType)
 	// log.Println(d.Row(1).Col("GRADEX"))
