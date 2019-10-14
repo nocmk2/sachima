@@ -18,7 +18,7 @@ const jsonPath string = "../data/rule.json"
 
 //Rule read from rule.json by default
 type Rule struct {
-	catalog     gjson.Result
+	CatalogRaw  gjson.Result
 	rulePath    string
 	featureRaw  gjson.Result
 	featureList []string
@@ -53,7 +53,7 @@ func (r *Rule) lazyInit() {
 		r.colName = gjson.GetBytes(f, "colname").String()
 		r.table = gjson.GetBytes(f, "datasrc.name").String()
 		r.pk = gjson.GetBytes(f, "datasrc.pk").String()
-		r.catalog = gjson.GetBytes(f, "catalog")
+		r.CatalogRaw = gjson.GetBytes(f, "catalog")
 
 		r.featureRaw.ForEach(func(k, v gjson.Result) bool {
 			r.featureList = append(r.featureList, k.String())
@@ -99,32 +99,32 @@ func (r *Rule) GetScore(colname string, cell string) int64 {
 	return res
 }
 
-// Normalize (x-Min)/(MAX-MIN)
-func Normalize(a []int64, percent float64) dur.Col {
-	len := len(a)
-	min := a[0]
-	max := a[1]
-	res := make(dur.Col, len)
-	for i := 0; i < len; i++ {
-		if a[i] < min {
-			min = a[i]
-		}
+// // Normalize (x-Min)/(MAX-MIN)
+// func Normalize(a []int64, percent float64) dur.Col {
+// 	len := len(a)
+// 	min := a[0]
+// 	max := a[1]
+// 	res := make(dur.Col, len)
+// 	for i := 0; i < len; i++ {
+// 		if a[i] < min {
+// 			min = a[i]
+// 		}
 
-		if a[i] > max {
-			max = a[i]
-		}
-	}
+// 		if a[i] > max {
+// 			max = a[i]
+// 		}
+// 	}
 
-	if min == max {
-		return res
-	}
+// 	if min == max {
+// 		return res
+// 	}
 
-	for i := 0; i < len; i++ {
-		res[i] = percent * ((float64)(a[i]-min) / (float64)(max-min))
-	}
+// 	for i := 0; i < len; i++ {
+// 		res[i] = percent * ((float64)(a[i]-min) / (float64)(max-min))
+// 	}
 
-	return res
-}
+// 	return res
+// }
 
 // TODO: 开发ruler规则
 // TODO: 支持前置条件
@@ -133,9 +133,9 @@ func (r *Rule) cal(d dur.Data) {
 	// r.featureList
 	var catalogList []string
 
-	r.catalog.ForEach(func(k, v gjson.Result) bool {
+	r.CatalogRaw.ForEach(func(k, v gjson.Result) bool {
 		catalogName := k.String()
-		var scores []int64
+		var scores dur.Col
 		log.Println(k, v)
 		catalogList = append(catalogList, catalogName)
 		weight := v.Get("weight").Float()
@@ -157,9 +157,9 @@ func (r *Rule) cal(d dur.Data) {
 		}
 
 		// log.Println(scores)
-		normScores := Normalize(scores, weight)
-
-		d.InsertCol(catalogName, dur.Col(normScores))
+		normScores := scores.Normalize().M(weight)
+		d.InsertCol(catalogName+"_ORI", scores)
+		d.InsertCol(catalogName, normScores)
 
 		// d.InsertCol(k.String(), normScores)
 		log.Println("normScores", normScores)
@@ -180,6 +180,7 @@ func (r *Rule) cal(d dur.Data) {
 	d.InsertCol(r.colName, col)
 	// log.Println(d.Rows())
 	log.Println(d)
+	d.ToSQL("dx_score_res", "localmysql8")
 	// log.Println(d.Row(1).Col("GRADEX"))
 
 }
