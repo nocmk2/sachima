@@ -148,7 +148,7 @@ func (r *Rule) cal(d dur.Data) {
 				// resData.Row(i).Col(colname) = score
 			}
 			scores = append(scores, score)
-			log.Println(score)
+			// log.Println(score)
 		}
 
 		// log.Println(scores)
@@ -162,7 +162,7 @@ func (r *Rule) cal(d dur.Data) {
 		return true
 	})
 
-	log.Println(d)
+	// log.Println(d)
 
 	col := resData.Col(catalogList[0])
 	log.Println("catalogList", catalogList)
@@ -171,7 +171,7 @@ func (r *Rule) cal(d dur.Data) {
 		col = col.Add(resData.Col(catalogList[i]))
 		// log.Println("-----------")
 		// log.Println(catalogList[i])
-		log.Println(col)
+		// log.Println(col)
 	}
 	resData.InsertCol(r.colName, col)
 	pk := strings.Split(r.pk, ",")
@@ -182,7 +182,6 @@ func (r *Rule) cal(d dur.Data) {
 	// log.Println(d.Rows())
 	// resData.ToSQL("dx_score_res", "localmysql8")
 	resData.InsertCol("GRADE", r.getRulerGrade(resData.Col(r.colName).Percentile()))
-	resData.Col("xxxxll")
 	log.Println(resData)
 	resData.ToSQL(r.DataTargetTable, r.DataTargetType)
 	// log.Println(d.Row(1).Col("GRADEX"))
