@@ -40,6 +40,41 @@ type Col []interface{}
 // 	}
 // }
 
+// M Multiple c by n
+func (c Col) M(n float64) Col {
+	for i := 0; i < len(c); i++ {
+		c[i] = c[i].(float64) * n
+	}
+	return c
+}
+
+// Normalize ..
+func (c Col) Normalize() Col {
+	len := len(c)
+	min := c[0].(int64)
+	max := c[1].(int64)
+	res := make(Col, len)
+	for i := 0; i < len; i++ {
+		if c[i].(int64) < min {
+			min = c[i].(int64)
+		}
+
+		if c[i].(int64) > max {
+			max = c[i].(int64)
+		}
+	}
+
+	if min == max {
+		return res
+	}
+
+	for i := 0; i < len; i++ {
+		res[i] = ((float64)(c[i].(int64) - min)) / (float64)(max-min)
+	}
+
+	return res
+}
+
 // Add :  Columns add return new Col
 func (c Col) Add(added Col) Col {
 	newCol := make(Col, len(c))
@@ -149,6 +184,12 @@ func (d *Data) getCreateStmt(table string) string {
 	stmt := "CREATE TABLE " + table + "("
 	for col := range d.dt {
 		switch d.dt[col][0].(type) {
+		default:
+			log.Println("++++++++++++++++++++=")
+		case float64:
+			stmt += col + " float(10,6)"
+		case int64:
+			stmt += col + " int(11)"
 		case string:
 			stmt += col + " varchar(50)"
 		case int:
