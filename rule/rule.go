@@ -18,15 +18,17 @@ const jsonPath string = "../data/rule.json"
 
 //Rule read from rule.json by default
 type Rule struct {
-	CatalogRaw  gjson.Result
-	rulePath    string
-	featureRaw  gjson.Result
-	featureList []string
-	srcsql      string
-	colName     string
-	table       string
-	pk          string
-	doOnce      sync.Once
+	CatalogRaw      gjson.Result
+	rulePath        string
+	featureRaw      gjson.Result
+	featureList     []string
+	srcsql          string
+	colName         string
+	table           string
+	pk              string
+	DataTargetTable string
+	DataTargetType  string
+	doOnce          sync.Once
 }
 
 func (r *Rule) getFeaturesByCatalog(catalogName string) []string {
@@ -54,6 +56,8 @@ func (r *Rule) lazyInit() {
 		r.table = gjson.GetBytes(f, "datasrc.name").String()
 		r.pk = gjson.GetBytes(f, "datasrc.pk").String()
 		r.CatalogRaw = gjson.GetBytes(f, "catalog")
+		r.DataTargetTable = gjson.GetBytes(f, "datatarget.table").String()
+		r.DataTargetType = gjson.GetBytes(f, "datatarget.type").String()
 
 		r.featureRaw.ForEach(func(k, v gjson.Result) bool {
 			r.featureList = append(r.featureList, k.String())
@@ -129,6 +133,7 @@ func (r *Rule) GetScore(colname string, cell string) int64 {
 // TODO: 开发ruler规则
 // TODO: 支持前置条件
 func (r *Rule) cal(d dur.Data) {
+	var resData dur.Data
 	r.lazyInit()
 	// r.featureList
 	var catalogList []string
@@ -143,9 +148,6 @@ func (r *Rule) cal(d dur.Data) {
 
 		for i := 0; i < d.Rows(); i++ {
 			score := initScore
-			// pk := strings.Split(r.pk, ",")
-			// log.Println(pk[0], ":", d.Row(i).Col(pk[0]))
-			// log.Println(pk[1], ":", d.Row(i).Col(pk[1]))
 			for _, colname := range r.getFeaturesByCatalog(catalogName) {
 				cell := d.Row(i).Col(colname)
 				// log.Println(colname, ":", cell)
@@ -157,9 +159,9 @@ func (r *Rule) cal(d dur.Data) {
 		}
 
 		// log.Println(scores)
-		normScores := scores.Normalize().M(weight)
-		d.InsertCol(catalogName+"_ORI", scores)
-		d.InsertCol(catalogName, normScores)
+		normScores := scores.Normalize().Mul(weight)
+		resData.InsertCol(catalogName+"_ORI", scores)
+		resData.InsertCol(catalogName, normScores)
 
 		// d.InsertCol(k.String(), normScores)
 		log.Println("normScores", normScores)
@@ -169,20 +171,33 @@ func (r *Rule) cal(d dur.Data) {
 
 	log.Println(d)
 
-	col := d.Col(catalogList[0])
+	col := resData.Col(catalogList[0])
 	log.Println("catalogList", catalogList)
 	for i := 1; i < len(catalogList); i++ {
 		// log.Println(catalogList[i])
-		col = col.Add(d.Col(catalogList[i]))
+		col = col.Add(resData.Col(catalogList[i]))
 		// log.Println("-----------")
 		// log.Println(catalogList[i])
+		log.Println(col)
 	}
-	d.InsertCol(r.colName, col)
+	resData.InsertCol(r.colName, col)
+	pk := strings.Split(r.pk, ",")
+	// log.Println(pk[0], ":", d.Row(i).Col(pk[0]))
+	// log.Println(pk[1], ":", d.Row(i).Col(pk[1]))
+	resData.InsertCol(pk[0], d.Col(pk[0]))
+	resData.InsertCol(pk[1], d.Col(pk[1]))
 	// log.Println(d.Rows())
-	log.Println(d)
-	d.ToSQL("dx_score_res", "localmysql8")
+	log.Println(resData)
+	// resData.ToSQL("dx_score_res", "localmysql8")
+	resData.ToSQL(r.DataTargetTable, r.DataTargetType)
 	// log.Println(d.Row(1).Col("GRADEX"))
 
+}
+
+func (r *Rule) getRulerGrade(col dur.Col) dur.Col {
+	col.Percentile()
+
+	return dur.Col{}
 }
 
 func parse() {

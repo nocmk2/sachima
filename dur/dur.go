@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"io/ioutil"
 	"log"
+	"sort"
 
 	// mysql driver
 	_ "github.com/go-sql-driver/mysql"
@@ -40,10 +41,25 @@ type Col []interface{}
 // 	}
 // }
 
-// M Multiple c by n
-func (c Col) M(n float64) Col {
+// Mul  Multiple c by n
+func (c Col) Mul(n float64) Col {
 	for i := 0; i < len(c); i++ {
 		c[i] = c[i].(float64) * n
+	}
+	return c
+}
+
+// Div Divid c by n
+func (c Col) Div(n float64) Col {
+	switch c[0].(type) {
+	case float64:
+		for i := 0; i < len(c); i++ {
+			c[i] = c[i].(float64) / n
+		}
+	case int:
+		for i := 0; i < len(c); i++ {
+			c[i] = (float64)(c[i].(int)) / n
+		}
 	}
 	return c
 }
@@ -75,7 +91,7 @@ func (c Col) Normalize() Col {
 	return res
 }
 
-// Add :  Columns add return new Col
+// Add :  Add tow Col
 func (c Col) Add(added Col) Col {
 	newCol := make(Col, len(c))
 	for i := 0; i < len(c); i++ {
@@ -90,8 +106,54 @@ func (c Col) Add(added Col) Col {
 	return newCol
 }
 
+func (c Col) Len() int { return len(c) }
+func (c Col) Less(i, j int) bool {
+	// log.Println(reflect.TypeOf(c[0]))
+	switch c[0].(type) {
+	case string:
+		log.Panic("string Less cmp")
+	case int:
+		return c[i].(int) < c[j].(int)
+	case int64:
+		return c[i].(int64) < c[j].(int64)
+	case float64:
+		return c[i].(float64) < c[j].(float64)
+	}
+	return true
+}
+func (c Col) Swap(i, j int) { c[i], c[j] = c[j], c[i] }
+
+// Sort Col
+func (c Col) Sort() Col {
+	sort.Sort(c)
+	return c
+}
+
+// Rank Col
+func (c Col) Rank() Col {
+	sortedCol := c.Sort()
+
+	for i := 0; i < c.Len(); i++ {
+		for rank, v := range sortedCol {
+			if c[i] == v {
+				c[i] = rank
+				continue
+			}
+		}
+	}
+	return c
+}
+
+// Percentile For example, the 20th percentile is the value (or score) below which 20% of the observations may be found
+func (c Col) Percentile() Col {
+	return c.Rank().Div((float64)(c.Len()))
+}
+
 // InsertCol insert a Col []interface{} to data 在数据中插入一列
 func (d *Data) InsertCol(name string, values Col) {
+	if d.dt == nil {
+		d.dt = map[string][]interface{}{}
+	}
 	d.dt[name] = values
 }
 
