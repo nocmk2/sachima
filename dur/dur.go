@@ -325,7 +325,7 @@ func (d *Data) ToSQL(table string, con string) {
 		for _, colname := range columns {
 			box = append(box, d.dt[colname][i])
 		}
-		log.Println(box, " inserted")
+		// log.Println(box, " inserted")
 		_, err := stmt.Exec(box...)
 		if err != nil {
 			log.Fatal(err)

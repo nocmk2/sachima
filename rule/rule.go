@@ -84,19 +84,92 @@ func (r *Rule) lazyInit() {
 	})
 }
 
+//ParsePre run pre condition before bin
+func ParsePre(s string, row dur.Row) (int64, bool, error) {
+	a := strings.Split(s, " ")
+	if len(a) < 4 {
+		return 999, false, nil
+	}
+	log.Println(a)
+	col, err := strconv.ParseFloat(row.Col(a[0]), 64)
+	if err != nil {
+		return 999, false, err
+	}
+	res, err := strconv.ParseInt(a[3], 0, 64)
+	if err != nil {
+		return 999, false, err
+	}
+	var need bool
+	need = false
+
+	target, error := strconv.ParseFloat(a[2], 64)
+	if error != nil {
+		log.Panic(error)
+	}
+	log.Println(target)
+
+	switch a[1] {
+	default:
+		log.Panic("wrong pre format" + s)
+	case ">":
+		if col > target {
+			need = true
+		}
+		log.Println(">")
+	case "<":
+		if col < target {
+			need = true
+		}
+		log.Println("<")
+	case ">=":
+		if col >= target {
+			need = true
+		}
+		log.Println(">=")
+	case "<=":
+		if col <= target {
+			need = true
+		}
+		log.Println("<=")
+	case "=":
+		if col == target {
+			need = true
+		}
+		log.Println("=")
+	case "==":
+		if col == target {
+			need = true
+		}
+		log.Println("==")
+	}
+
+	// score needscoreornot error
+	return res, need, nil
+}
+
 // GetScore return an int value get from feature.colname.bin
-func (r *Rule) GetScore(colname string, cell string) int64 {
+func (r *Rule) GetScore(colname string, row dur.Row) int64 {
+	cell := row.Col(colname)
 	var res int64
 	res = r.featureRaw.Get(colname + ".default").Int()
 	bin := r.featureRaw.Get(colname + ".bin") //gjson.GetBytes(r.featureRaw, colname+".bin")
 	bintype := r.featureRaw.Get(colname + ".bintype").String()
+	// pre logic
+	pre := r.featureRaw.Get(colname + ".pre").String()
+	preScore, need, error := ParsePre(pre, row)
+	if error != nil {
+		log.Println(error)
+	}
+	if need {
+		return preScore
+	}
 
 	// if number
 	if bintype == "math" {
 		bin.ForEach(func(k, v gjson.Result) bool {
 			n, err := strconv.ParseFloat(cell, 64)
 			if err != nil {
-				log.Panic("bin value type should be float64")
+				return false // if cannot conv to flat64 for example null then break and use default value
 			}
 			if mathinterval.Get(k.String()).Hit(n) {
 				res = v.Int()
@@ -117,7 +190,6 @@ func (r *Rule) GetScore(colname string, cell string) int64 {
 	return res
 }
 
-// TODO: 支持前置条件
 func (r *Rule) cal(d dur.Data) {
 	var resData dur.Data
 	r.lazyInit()
@@ -139,9 +211,10 @@ func (r *Rule) cal(d dur.Data) {
 		for i := 0; i < d.Rows(); i++ {
 			score := initScore
 			for _, colname := range r.getFeaturesByCatalog(catalogName) {
-				cell := d.Row(i).Col(colname)
+				// pre "m1_apply_cnt <=1 0"
+
 				// log.Println(colname, ":", cell)
-				binscore := r.GetScore(colname, cell)
+				binscore := r.GetScore(colname, d.Row(i))
 				score += binscore
 				resData.Col(colname)[i] = binscore
 				// resData.Col(colname).Row(i) = score
@@ -190,7 +263,7 @@ func (r *Rule) cal(d dur.Data) {
 	resData.InsertCol("PERCENTILE", pctCol)
 
 	resData.InsertCol("GRADE", r.getRulerGrade(pctCol))
-	log.Println(resData)
+	// log.Println(resData)
 	resData.ToSQL(r.DataTargetTable, r.DataTargetType)
 	// log.Println(d.Row(1).Col("GRADEX"))
 
