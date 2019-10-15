@@ -17,6 +17,14 @@ package main
 
 import "github.com/nocmk2/sachima/cmd"
 
+// TODO: tide up code  add comment
+// TODO: cli gen demo rule.json and src data
+// TODO: add github README
+// TODO: dur refactor it to indepandent package nocmk2/rubik
+// TODO: rule.json format check  real time api
+// TODO: sachima-ui modify rule.json on real
+// TODO: 99% testcov
+
 func main() {
 	cmd.Execute()
 }
