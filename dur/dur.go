@@ -125,27 +125,31 @@ func (c Col) Swap(i, j int) { c[i], c[j] = c[j], c[i] }
 
 // Sort Col
 func (c Col) Sort() Col {
-	sort.Sort(c)
-	return c
+	resCol := make(Col, c.Len())
+	copy(resCol, c)
+	sort.Sort(resCol)
+	return resCol
 }
 
 // Rank Col
 func (c Col) Rank() Col {
 	sortedCol := c.Sort()
+	resCol := make(Col, c.Len())
 
 	for i := 0; i < c.Len(); i++ {
 		for rank, v := range sortedCol {
 			if c[i] == v {
-				c[i] = rank
+				resCol[i] = rank
 				continue
 			}
 		}
 	}
-	return c
+	return resCol
 }
 
 // Percentile For example, the 20th percentile is the value (or score) below which 20% of the observations may be found
 func (c Col) Percentile() Col {
+	log.Println("RANK:", c.Rank())
 	return c.Rank().Div((float64)(c.Len()))
 }
 

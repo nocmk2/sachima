@@ -96,7 +96,7 @@ func (r *Rule) GetScore(colname string, cell string) int64 {
 		bin.ForEach(func(k, v gjson.Result) bool {
 			n, err := strconv.ParseFloat(cell, 64)
 			if err != nil {
-				n = 0
+				log.Panic("bin value type should be float64")
 			}
 			if mathinterval.Get(k.String()).Hit(n) {
 				res = v.Int()
@@ -169,19 +169,27 @@ func (r *Rule) cal(d dur.Data) {
 	for i := 1; i < len(catalogList); i++ {
 		// log.Println(catalogList[i])
 		col = col.Add(resData.Col(catalogList[i]))
-		// log.Println("-----------")
+		log.Println("-----------")
 		// log.Println(catalogList[i])
-		// log.Println(col)
 	}
-	resData.InsertCol(r.colName, col)
+
 	pk := strings.Split(r.pk, ",")
-	// log.Println(pk[0], ":", d.Row(i).Col(pk[0]))
-	// log.Println(pk[1], ":", d.Row(i).Col(pk[1]))
 	resData.InsertCol(pk[0], d.Col(pk[0]))
 	resData.InsertCol(pk[1], d.Col(pk[1]))
-	// log.Println(d.Rows())
-	// resData.ToSQL("dx_score_res", "localmysql8")
-	resData.InsertCol("GRADE", r.getRulerGrade(resData.Col(r.colName).Percentile()))
+
+	// log.Println(resData.Col(catalogList[0]))
+	// log.Println(resData.Col(catalogList[1]))
+	// log.Println("col++++++++++++++++++++++++")
+	// log.Println(col)
+
+	resData.InsertCol(r.colName, col)
+	// rank := resData.Col(r.colName).Rank()
+	// resData.InsertCol("rank", rank)
+
+	pctCol := resData.Col(r.colName).Percentile()
+	resData.InsertCol("PERCENTILE", pctCol)
+
+	resData.InsertCol("GRADE", r.getRulerGrade(pctCol))
 	log.Println(resData)
 	resData.ToSQL(r.DataTargetTable, r.DataTargetType)
 	// log.Println(d.Row(1).Col("GRADEX"))
