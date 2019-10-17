@@ -259,7 +259,7 @@ func (r *Rule) cal(d dur.Data) {
 	// rank := resData.Col(r.colName).Rank()
 	// resData.InsertCol("rank", rank)
 
-	pctCol := resData.Col(r.colName).Percentile()
+	pctCol := resData.Col(r.colName).Percentile(true)
 	resData.InsertCol("PERCENTILE", pctCol)
 
 	resData.InsertCol("GRADE", r.getRulerGrade(pctCol))
@@ -269,12 +269,12 @@ func (r *Rule) cal(d dur.Data) {
 
 }
 
-func (r *Rule) getRulerGrade(col dur.Col) dur.Col {
-	percents := col.Percentile()
+func (r *Rule) getRulerGrade(pctcol dur.Col) dur.Col {
+	// percents := col.Percentile(true)
 	var res dur.Col
-	for i := 0; i < col.Len(); i++ {
+	for i := 0; i < pctcol.Len(); i++ {
 		r.RulersRaw.ForEach(func(k, v gjson.Result) bool {
-			if mathinterval.Get(k.String()).Hit((percents[i]).(float64)) {
+			if mathinterval.Get(k.String()).Hit((pctcol[i]).(float64)) {
 				res = append(res, v.String())
 				return false
 			}

@@ -124,16 +124,18 @@ func (c Col) Less(i, j int) bool {
 func (c Col) Swap(i, j int) { c[i], c[j] = c[j], c[i] }
 
 // Sort Col
-func (c Col) Sort() Col {
+func (c Col) Sort(reverse bool) Col {
 	resCol := make(Col, c.Len())
 	copy(resCol, c)
-	sort.Sort(resCol)
+	if reverse == true {
+		sort.Sort(sort.Reverse(resCol))
+	}
 	return resCol
 }
 
 // Rank Col
-func (c Col) Rank() Col {
-	sortedCol := c.Sort()
+func (c Col) Rank(reverse bool) Col {
+	sortedCol := c.Sort(reverse)
 	resCol := make(Col, c.Len())
 
 	for i := 0; i < c.Len(); i++ {
@@ -148,9 +150,9 @@ func (c Col) Rank() Col {
 }
 
 // Percentile For example, the 20th percentile is the value (or score) below which 20% of the observations may be found
-func (c Col) Percentile() Col {
-	log.Println("RANK:", c.Rank())
-	return c.Rank().Div((float64)(c.Len()))
+func (c Col) Percentile(reverse bool) Col {
+	// log.Println("RANK:", c.Rank(reverse))
+	return c.Rank(reverse).Div((float64)(c.Len()))
 }
 
 // InsertCol insert a Col []interface{} to data 在数据中插入一列
