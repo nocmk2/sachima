@@ -289,7 +289,7 @@ func (d *Data) getInsertStmt(table string) (string, []string) {
 }
 
 //ToSQL write Data to db table
-func (d *Data) ToSQL(table string, con string) {
+func (d *Data) ToSQL(table string, con string, drop bool) {
 	db := readDBConfig(con)
 	defer db.Close()
 
@@ -298,20 +298,21 @@ func (d *Data) ToSQL(table string, con string) {
 		panic("invalid table name! table name should begin with " + tablePrefix)
 	}
 
-	// if table not exists create it
-	_, err := db.Exec("DROP TABLE IF EXISTS " + table)
-	if err == nil {
-		log.Println(con + " Table " + table + " dropped!")
+	if drop == true {
+		_, err := db.Exec("DROP TABLE IF EXISTS " + table)
+		if err == nil {
+			log.Println(con + " Table " + table + " dropped!")
 
-		stmt, err := db.Prepare(d.getCreateStmt(table))
-		defer stmt.Close()
-		if err != nil {
+			stmt, err := db.Prepare(d.getCreateStmt(table))
+			defer stmt.Close()
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			stmt.Exec()
+		} else {
 			log.Fatal(err)
 		}
-
-		stmt.Exec()
-	} else {
-		log.Fatal(err)
 	}
 
 	insertStmt, columns := d.getInsertStmt(table)

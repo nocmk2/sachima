@@ -264,7 +264,7 @@ func (r *Rule) cal(d dur.Data) {
 
 	resData.InsertCol("GRADE", r.getRulerGrade(pctCol))
 	// log.Println(resData)
-	resData.ToSQL(r.DataTargetTable, r.DataTargetType)
+	resData.ToSQL(r.DataTargetTable, r.DataTargetType, false)
 	// log.Println(d.Row(1).Col("GRADEX"))
 
 }
