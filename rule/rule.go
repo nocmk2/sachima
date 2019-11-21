@@ -1,4 +1,4 @@
-package main
+package rule
 
 import (
 	"io/ioutil"
@@ -296,6 +296,8 @@ func parse() {
 	rule1.cal(d)
 }
 
-func main() {
+//Run for batch
+func Run() {
+	log.Println("rule run.....")
 	parse()
 }
