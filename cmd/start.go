@@ -16,7 +16,7 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/nocmk2/sachima/auth"
+	"github.com/nocmk2/sachima/server"
 	"github.com/spf13/cobra"
 )
 
@@ -31,7 +31,7 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		auth.Start()
+		server.Start()
 		//fmt.Println("start called")
 	},
 }
