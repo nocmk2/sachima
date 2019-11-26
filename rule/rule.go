@@ -33,6 +33,17 @@ type Rule struct {
 	doOnce          sync.Once
 }
 
+// ReadRuleFile read rule.json file
+func (r *Rule) ReadRuleFile(path string) {
+	r.rulePath = path
+}
+
+// FeatureList return rule.featurelist
+func (r *Rule) FeatureList() []string {
+	r.lazyInit()
+	return r.featureList
+}
+
 func (r *Rule) getFeaturesByCatalog(catalogName string) []string {
 	var res []string
 	r.featureRaw.ForEach(func(k, v gjson.Result) bool {
