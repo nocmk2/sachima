@@ -18,14 +18,15 @@ func router(r *gin.Engine, au *jwt.GinJWTMiddleware) {
 		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
 	})
 
-	auth := r.Group("/auth")
+	sachima := r.Group("/sachima")
 	// Refresh time can be longer than token timeout
-	auth.GET("/refresh_token", au.RefreshHandler)
-	auth.Use(au.MiddlewareFunc())
+	sachima.GET("/refresh_token", au.RefreshHandler)
+	sachima.Use(au.MiddlewareFunc())
 	{
-		auth.GET("/hello", helloHandler)
-		auth.GET("/role", roleHandler)
-		auth.GET("/signup", signupHandler)
-		auth.GET("/rules", rulesHandler)
+		sachima.GET("/hello", helloHandler)
+		sachima.GET("/role", roleHandler)
+		sachima.GET("/signup", signupHandler)
+		sachima.GET("/featurelists", featurelistsHandler)
+		sachima.GET("/featuredetail:feature", featuredetailHandler)
 	}
 }

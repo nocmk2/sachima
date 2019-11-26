@@ -8,15 +8,21 @@ import (
 
 const jsonPath string = "data/rule.json"
 
-func features() []string {
+func featurelists() []string {
 	rule1 := rule.Rule{}
 	rule1.ReadRuleFile(jsonPath)
 	return rule1.FeatureList()
 }
 
-func rulesHandler(c *gin.Context) {
-	f := features()
-	// log.Println(string(f))
+func featureName(name string) string {
+	rule1 := rule.Rule{}
+	rule1.ReadRuleFile(jsonPath)
+	// return rule1.
+	return "jijfiejf"
+}
+
+func featurelistsHandler(c *gin.Context) {
+	f := featurelists()
 	claims := jwt.ExtractClaims(c)
 	user, _ := c.Get(identityKey)
 
@@ -24,5 +30,18 @@ func rulesHandler(c *gin.Context) {
 		"userID":   claims[identityKey],
 		"userName": user.(*User).UserName,
 		"text":     f,
+	})
+}
+
+func featuredetailHandler(c *gin.Context) {
+	fname := c.Param("feature")
+	cname := featureName(fname)
+	claims := jwt.ExtractClaims(c)
+	user, _ := c.Get(identityKey)
+
+	c.JSON(200, gin.H{
+		"userID":   claims[identityKey],
+		"userName": user.(*User).UserName,
+		"text":     cname,
 	})
 }

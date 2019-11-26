@@ -44,6 +44,12 @@ func (r *Rule) FeatureList() []string {
 	return r.featureList
 }
 
+// FeatureName return specific feature name
+func (r *Rule) FeatureName(feature string) string {
+	r.lazyInit()
+	return r.featureRaw.Get(feature + ".name").String()
+}
+
 func (r *Rule) getFeaturesByCatalog(catalogName string) []string {
 	var res []string
 	r.featureRaw.ForEach(func(k, v gjson.Result) bool {
