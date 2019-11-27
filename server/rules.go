@@ -20,6 +20,13 @@ func featureName(name string) string {
 	return rule1.FeatureName(name)
 }
 
+func featureBin(name string) map[string]int {
+	rule1 := rule.Rule{}
+	rule1.ReadRuleFile(jsonPath)
+	// return rule1.FeatureBin(name)
+	return map[string]int{"a": 100, "b": -99}
+}
+
 func featurelistsHandler(c *gin.Context) {
 	f := featurelists()
 	claims := jwt.ExtractClaims(c)
@@ -34,6 +41,7 @@ func featurelistsHandler(c *gin.Context) {
 
 func featuredetailHandler(c *gin.Context) {
 	fname := c.Param("feature")
+	bin := featureBin(fname)
 	cname := featureName(fname)
 	claims := jwt.ExtractClaims(c)
 	user, _ := c.Get(identityKey)
@@ -41,6 +49,7 @@ func featuredetailHandler(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"userID":   claims[identityKey],
 		"userName": user.(*User).UserName,
-		"text":     cname,
+		"name":     cname,
+		"bin":      bin,
 	})
 }

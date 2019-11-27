@@ -50,6 +50,12 @@ func (r *Rule) FeatureName(feature string) string {
 	return r.featureRaw.Get(feature + ".name").String()
 }
 
+// FeatureBin return bin of feature
+func (r *Rule) FeatureBin(feature string) string {
+	r.lazyInit()
+	return r.featureRaw.Get(feature + ".bin").String()
+}
+
 func (r *Rule) getFeaturesByCatalog(catalogName string) []string {
 	var res []string
 	r.featureRaw.ForEach(func(k, v gjson.Result) bool {
