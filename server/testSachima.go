@@ -25,3 +25,11 @@ func test2Handler(c *gin.Context) {
 		"text": "Test2 Sachima",
 	})
 }
+
+func test3Handler(c *gin.Context) {
+	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+	fname := c.Param("feature")
+	c.JSON(200, gin.H{
+		"text": fname,
+	})
+}

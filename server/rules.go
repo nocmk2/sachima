@@ -17,8 +17,7 @@ func featurelists() []string {
 func featureName(name string) string {
 	rule1 := rule.Rule{}
 	rule1.ReadRuleFile(jsonPath)
-	// return rule1.
-	return "jijfiejf"
+	return rule1.FeatureName(name)
 }
 
 func featurelistsHandler(c *gin.Context) {
