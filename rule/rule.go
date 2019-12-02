@@ -14,7 +14,7 @@ import (
 
 // read and parse rule.json
 
-const jsonPath string = "../data/rule.json"
+const jsonPath string = "./data/rule.json"
 
 //Rule read from rule.json by default
 type Rule struct {

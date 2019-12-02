@@ -12,7 +12,7 @@ import (
 )
 
 const tablePrefix string = "dx"
-const dbConPath string = "../data/db.json"
+const dbConPath string = "./data/db.json"
 
 //Data struct
 type Data struct {
