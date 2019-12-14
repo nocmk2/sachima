@@ -8,6 +8,12 @@ import (
 
 const jsonPath string = "data/rule.json"
 
+func featureRaw() interface{} {
+	r := rule.Rule{}
+	r.ReadRuleFile(jsonPath)
+	return r.Features()
+}
+
 func featurelists() []string {
 	rule1 := rule.Rule{}
 	rule1.ReadRuleFile(jsonPath)
@@ -29,6 +35,20 @@ func featureBin(name string) map[string]int {
 
 func featurelistsHandler(c *gin.Context) {
 	f := featurelists()
+	// f := featureRaw()
+	claims := jwt.ExtractClaims(c)
+	user, _ := c.Get(identityKey)
+
+	c.JSON(200, gin.H{
+		"userID":   claims[identityKey],
+		"userName": user.(*User).UserName,
+		"features": f,
+	})
+}
+
+func featuresHandler(c *gin.Context) {
+	// f := featurelists()
+	f := featureRaw()
 	claims := jwt.ExtractClaims(c)
 	user, _ := c.Get(identityKey)
 

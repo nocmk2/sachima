@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"log"
 	"strconv"
@@ -36,6 +37,23 @@ type Rule struct {
 // ReadRuleFile read rule.json file
 func (r *Rule) ReadRuleFile(path string) {
 	r.rulePath = path
+}
+
+// Features return gjson.Result format whole Features data
+func (r *Rule) Features() interface{} {
+	r.lazyInit()
+	// 	b := []byte(`{
+	//    "k1" : "v1",
+	//    "k3" : 10,
+	//    result:["v4",12.3,{"k11" : "v11", "k22" : "v22"}]
+	// }`)
+	b := []byte(r.featureRaw.String())
+	var f interface{}
+	err := json.Unmarshal(b, &f)
+	if err != nil {
+		panic(err)
+	}
+	return f
 }
 
 // FeatureList return rule.featurelist
