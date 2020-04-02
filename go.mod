@@ -6,6 +6,8 @@ go 1.13
 
 require (
 	github.com/appleboy/gin-jwt/v2 v2.6.2
+	github.com/casbin/casbin v1.7.0
+	github.com/casbin/casbin/v2 v2.2.2
 	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-sql-driver/mysql v1.4.1

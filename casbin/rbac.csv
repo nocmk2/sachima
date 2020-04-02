@@ -1,0 +1,13 @@
+p, superAdmin, project, read
+p, superAdmin, project, write
+p, admin, project, read
+p, admin, project, write
+p, admin, asse, read
+p, admin, asse, write
+p, zhuangjia, project, write
+p, zhuangjia, asse, write
+p, shangshang, project, read
+p, shangshang, asse, read
+
+g, quyuan, admin
+g, wenyin, zhuangjia
