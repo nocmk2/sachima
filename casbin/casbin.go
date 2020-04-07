@@ -25,10 +25,16 @@ func main() {
 	} else {
 		// deny the request, show an error
 	}
-	hasrole, _ := e.HasRoleForUser("wenyin", "Supseradmin")
-	e.AddRoleForUser("wenyin", "Uxdd")
-	roles, _ := e.GetRolesForUser("wenyin")
+	hasrole, _ := e.HasRoleForUser("wenyin", "Supseradmin") //判断用户角色
+	e.AddRoleForUser("wenyin", "Uxdd")                      //用户增加角色
+	roles, _ := e.GetRolesForUser("wenyin")                 //获取角色
+	users, _ := e.GetUsersForRole("zhuangjia")              // 获取角色对应的用户
+	e.DeleteRoleForUser("wenyin", "superAdmin")
+
+	e.SavePolicy()
 
 	fmt.Println(hasrole)
 	fmt.Println(roles)
+	fmt.Println(users)
+	fmt.Println(hasrole)
 }
