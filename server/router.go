@@ -11,7 +11,7 @@ func router(r *gin.Engine, au *jwt.GinJWTMiddleware) {
 	r.POST("/login", au.LoginHandler)
 	r.GET("/test", testHandler)
 	r.GET("/test2", test2Handler)
-	r.GET("/feature/:feature", test3Handler)
+	r.GET("/test3/:arg", test3Handler)
 
 	r.NoRoute(au.MiddlewareFunc(), func(c *gin.Context) {
 		claims := jwt.ExtractClaims(c)

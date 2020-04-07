@@ -13,7 +13,7 @@ func Capitalize(name string) string {
 	return strings.ToUpper(name)
 }
 
-func main() {
+func main1() {
 	r := gin.Default()
 
 	r.GET("/ping", func(c *gin.Context) {

@@ -64,7 +64,7 @@ func test2Handler(c *gin.Context) {
 
 func test3Handler(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-	fname := c.Param("feature")
+	fname := c.Param("arg")
 	c.JSON(200, gin.H{
 		"text": fname,
 	})

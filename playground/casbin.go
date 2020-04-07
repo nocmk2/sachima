@@ -6,7 +6,7 @@ import (
 	"github.com/casbin/casbin/v2"
 )
 
-func main() {
+func main2() {
 	e, err := casbin.NewEnforcer("../data/rbac.conf", "../data/rbac.csv")
 
 	sub := "alice" // the user that wants to access a resource.
