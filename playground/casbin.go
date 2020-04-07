@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	e, err := casbin.NewEnforcer("./rbac.conf", "./rbac.csv")
+	e, err := casbin.NewEnforcer("../data/rbac.conf", "../data/rbac.csv")
 
 	sub := "alice" // the user that wants to access a resource.
 	obj := "data1" // the resource that is going to be accessed.
