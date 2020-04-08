@@ -26,7 +26,7 @@ Authorization: Bearer {{token}}
 content-type: application/json
 
 {
-    "username": "admin",
+    "username": "jerry",
     "password": "88887777",
-    "emal":"admin@sachima.com"
+    "email":"john@sachima.com"
 }

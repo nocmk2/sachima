@@ -1,7 +1,6 @@
 package server
 
 import (
-	"log"
 	"net/http"
 	"time"
 
@@ -144,6 +143,7 @@ func featuredetailHandler(c *gin.Context) {
 }
 
 func adduserHandler(c *gin.Context) {
+	db := component.DB
 	var user User
 	// This will infer what binder to use depending on the content-type header.
 	if err := c.ShouldBind(&user); err != nil {
@@ -152,16 +152,9 @@ func adduserHandler(c *gin.Context) {
 	}
 
 	hash := pass.HashAndSalt([]byte(user.Password))
-	log.Println(hash)
 
-	log.Println("save to database")
-	log.Println(component.DB)
+	new := User{UserName: user.UserName, Password: hash, Email: user.Email}
+	db.Create(&new)
 
 	c.JSON(http.StatusOK, gin.H{"status": hash})
-
-	// c.JSON(200, gin.H{
-	// 	"status":  "posted",
-	// 	"message": message,
-	// 	"nick":    nick,
-	// })
 }
