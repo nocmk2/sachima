@@ -95,13 +95,14 @@ func Jwt() *jwt.GinJWTMiddleware {
 func Casbin(obj string, act string, adapter *gormadapter.Adapter) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Get current user/subject
-		val, existed := c.Get("current_subject")
+		user, existed := c.Get(identityKey)
+		log.Println(user.(*User).UserName)
 		if !existed {
 			c.AbortWithStatusJSON(401, component.RestResponse{Message: "user hasn't logged in yet"})
 			return
 		}
 		// Casbin enforces policy
-		ok, err := enforce(val.(string), obj, act, adapter)
+		ok, err := enforce(user.(*User).UserName, obj, act, adapter)
 		if err != nil {
 			log.Println(err)
 			c.AbortWithStatusJSON(500, component.RestResponse{Message: "error occurred when authorizing user"})
@@ -117,7 +118,7 @@ func Casbin(obj string, act string, adapter *gormadapter.Adapter) gin.HandlerFun
 
 func enforce(sub string, obj string, act string, adapter *gormadapter.Adapter) (bool, error) {
 	// Load model configuration file and policy store adapter
-	enforcer := casbin.NewEnforcer("../data/rbac.conf", adapter)
+	enforcer := casbin.NewEnforcer("data/rbac.conf", adapter)
 	err := enforcer.LoadPolicy()
 	if err != nil {
 		return false, fmt.Errorf("failed to load policy from DB: %w", err)

@@ -8,13 +8,13 @@ import (
 
 func main2() {
 	e, err := casbin.NewEnforcer("../data/rbac.conf", "../data/rbac.csv")
+	e.EnableAutoSave(true)
 
 	sub := "alice" // the user that wants to access a resource.
 	obj := "data1" // the resource that is going to be accessed.
 	act := "read"  // the operation that the user performs on the resource.
 
 	ok, err := e.Enforce(sub, obj, act)
-	e.EnableAutoSave(true)
 
 	if err != nil {
 		// handle err

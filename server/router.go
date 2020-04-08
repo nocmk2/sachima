@@ -29,7 +29,7 @@ func router(r *gin.Engine, au *jwt.GinJWTMiddleware) {
 	sachima.GET("/refresh_token", au.RefreshHandler)
 	sachima.Use(au.MiddlewareFunc())
 	{
-		sachima.GET("/hello", Casbin("hello", "read", adapter), helloHandler)
+		sachima.GET("/hello", Casbin("hello", "write", adapter), helloHandler)
 		sachima.GET("/role", roleHandler)
 		sachima.GET("/signup", signupHandler)
 		sachima.GET("/featurelists", featurelistsHandler)

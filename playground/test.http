@@ -15,3 +15,7 @@ content-type: application/json
 ### get features 
 GET http://localhost:8000/sachima/features HTTP/1.1
 Authorization: Bearer {{token}} 
+
+### test casbin  
+GET http://localhost:8000/sachima/hello HTTP/1.1
+Authorization: Bearer {{token}} 

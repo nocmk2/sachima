@@ -27,7 +27,7 @@ type RestResponse struct {
 func init() {
 	// Connect to DB
 	var err error
-	DB, err = gorm.Open(dur.ReadDBConnStr("sachima"))
+	DB, err = gorm.Open(dur.ReadDBConnStr("sachima_local"))
 	if err != nil {
 		panic(fmt.Sprintf("failed to connect to DB: %v", err))
 	}
