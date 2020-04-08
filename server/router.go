@@ -11,6 +11,7 @@ import (
 )
 
 func router(r *gin.Engine, au *jwt.GinJWTMiddleware) {
+	// defer component.DB.Close()
 	adapter := gormadapter.NewAdapterByDB(component.DB)
 
 	r.POST("/login", au.LoginHandler)
@@ -35,5 +36,6 @@ func router(r *gin.Engine, au *jwt.GinJWTMiddleware) {
 		sachima.GET("/featurelists", featurelistsHandler)
 		sachima.GET("/features", featuresHandler)
 		sachima.GET("/featuredetail/:feature", featuredetailHandler)
+		sachima.POST("/adduser", Casbin("config", "write", adapter), adduserHandler)
 	}
 }

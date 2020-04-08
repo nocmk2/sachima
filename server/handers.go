@@ -1,11 +1,17 @@
 package server
 
 import (
+	"log"
+	"net/http"
 	"time"
+
+	"github.com/nocmk2/sachima/pass"
+	"github.com/nocmk2/sachima/server/component"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/nocmk2/sachima/rule"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func signupHandler(c *gin.Context) {
@@ -136,4 +142,49 @@ func featuredetailHandler(c *gin.Context) {
 		"name":     cname,
 		"bin":      bin,
 	})
+}
+
+//NewUser info
+// type NewUser struct {
+// 	UserName string `form:"user" json:"username" binding:"required"`
+// 	Password string `form:"password" json:"password" binding:"required"`
+// 	Email    string `json:"email"`
+// }
+
+func hashAndSalt(pwd []byte) string {
+
+	// Use GenerateFromPassword to hash & salt pwd.
+	// MinCost is just an integer constant provided by the bcrypt
+	// package along with DefaultCost & MaxCost.
+	// The cost can be any value you want provided it isn't lower
+	// than the MinCost (4)
+	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
+	if err != nil {
+		log.Println(err)
+	}
+	// GenerateFromPassword returns a byte slice so we need to
+	// convert the bytes to a string and return it
+	return string(hash)
+}
+
+func adduserHandler(c *gin.Context) {
+	var user User
+	// This will infer what binder to use depending on the content-type header.
+	if err := c.ShouldBind(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	hash := pass.HashAndSalt([]byte(user.Password))
+	log.Println(hash)
+	log.Println("save to database")
+	log.Println(component.DB)
+
+	c.JSON(http.StatusOK, gin.H{"status": hash})
+
+	// c.JSON(200, gin.H{
+	// 	"status":  "posted",
+	// 	"message": message,
+	// 	"nick":    nick,
+	// })
 }

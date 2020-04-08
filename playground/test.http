@@ -13,9 +13,20 @@ content-type: application/json
 @token = {{login.response.body.token}}
 
 ### get features 
-GET http://localhost:8000/sachima/features HTTP/1.1
+GET {{baseUrl}}/sachima/features HTTP/1.1
 Authorization: Bearer {{token}} 
 
 ### test casbin  
-GET http://localhost:8000/sachima/hello HTTP/1.1
+GET {{baseUrl}}/sachima/hello HTTP/1.1
 Authorization: Bearer {{token}} 
+
+### add user  
+POST {{baseUrl}}/sachima/adduser HTTP/1.1
+Authorization: Bearer {{token}} 
+content-type: application/json
+
+{
+    "username": "admin",
+    "password": "88887777",
+    "emal":"admin@sachima.com"
+}
