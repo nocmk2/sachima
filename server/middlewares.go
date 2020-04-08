@@ -1,11 +1,15 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"time"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
+	"github.com/casbin/casbin"
+	gormadapter "github.com/casbin/gorm-adapter"
 	"github.com/gin-gonic/gin"
+	"github.com/nocmk2/sachima/server/component"
 )
 
 // Jwt middleware
@@ -85,4 +89,40 @@ func Jwt() *jwt.GinJWTMiddleware {
 	}
 
 	return authMiddleware
+}
+
+// Casbin is Authorization middleware
+func Casbin(obj string, act string, adapter *gormadapter.Adapter) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Get current user/subject
+		val, existed := c.Get("current_subject")
+		if !existed {
+			c.AbortWithStatusJSON(401, component.RestResponse{Message: "user hasn't logged in yet"})
+			return
+		}
+		// Casbin enforces policy
+		ok, err := enforce(val.(string), obj, act, adapter)
+		if err != nil {
+			log.Println(err)
+			c.AbortWithStatusJSON(500, component.RestResponse{Message: "error occurred when authorizing user"})
+			return
+		}
+		if !ok {
+			c.AbortWithStatusJSON(403, component.RestResponse{Message: "forbidden"})
+			return
+		}
+		c.Next()
+	}
+}
+
+func enforce(sub string, obj string, act string, adapter *gormadapter.Adapter) (bool, error) {
+	// Load model configuration file and policy store adapter
+	enforcer := casbin.NewEnforcer("../data/rbac.conf", adapter)
+	err := enforcer.LoadPolicy()
+	if err != nil {
+		return false, fmt.Errorf("failed to load policy from DB: %w", err)
+	}
+	// Verify
+	ok := enforcer.Enforce(sub, obj, act)
+	return ok, err
 }

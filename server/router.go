@@ -3,11 +3,16 @@ package server
 import (
 	"log"
 
+	gormadapter "github.com/casbin/gorm-adapter"
+
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/nocmk2/sachima/server/component"
 )
 
 func router(r *gin.Engine, au *jwt.GinJWTMiddleware) {
+	adapter := gormadapter.NewAdapterByDB(component.DB)
+
 	r.POST("/login", au.LoginHandler)
 	r.GET("/test", testHandler)
 	r.GET("/test2", test2Handler)
@@ -24,7 +29,7 @@ func router(r *gin.Engine, au *jwt.GinJWTMiddleware) {
 	sachima.GET("/refresh_token", au.RefreshHandler)
 	sachima.Use(au.MiddlewareFunc())
 	{
-		sachima.GET("/hello", helloHandler)
+		sachima.GET("/hello", Casbin("hello", "read", adapter), helloHandler)
 		sachima.GET("/role", roleHandler)
 		sachima.GET("/signup", signupHandler)
 		sachima.GET("/featurelists", featurelistsHandler)

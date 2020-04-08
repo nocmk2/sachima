@@ -338,6 +338,18 @@ func (d *Data) ToSQL(table string, con string, drop bool) {
 }
 
 func readDBConfig(con string) *sql.DB {
+	dbtype, url := ReadDBConnStr(con)
+	// var text string
+	db, err := sql.Open(dbtype, url)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return db
+}
+
+//ReadDBConnStr read conf file and return dbtype,dburl
+func ReadDBConnStr(con string) (string, string) {
 	dat, err := ioutil.ReadFile(dbConPath)
 	json := string(dat)
 	if err != nil {
@@ -349,13 +361,7 @@ func readDBConfig(con string) *sql.DB {
 	dbuser := gjson.Get(json, con+".user").String()
 	dbpass := gjson.Get(json, con+".pass").String()
 	dbdb := gjson.Get(json, con+".db").String()
-	// var text string
-	db, err := sql.Open(dbtype, ""+dbuser+":"+dbpass+"@tcp("+dbip+":"+dbport+")/"+dbdb+"")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return db
+	return dbtype, "" + dbuser + ":" + dbpass + "@tcp(" + dbip + ":" + dbport + ")/" + dbdb + ""
 }
 
 // func main() {
