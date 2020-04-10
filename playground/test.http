@@ -30,3 +30,8 @@ content-type: application/json
     "password": "88887777",
     "email":"john@sachima.com"
 }
+
+### get roles
+POST {{baseUrl}}/sachima/getroles HTTP/1.1
+Authorization: Bearer {{token}} 
+content-type: application/json

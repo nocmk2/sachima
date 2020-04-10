@@ -168,6 +168,38 @@ func (d *Data) Col(name string) Col {
 	return d.dt[name]
 }
 
+//AllCols return whole data
+// {
+//   "id": [
+//     "admin",
+//     "caiwu",
+//     "shangwu",
+//     "fengxian",
+//     "fengxianadmin"
+//   ],
+//   "name": [
+//     "管理员",
+//     "财务部员工",
+//     "商务部员工",
+//     "风险部员工",
+//     "风险部经理"
+//   ]
+// }
+func (d *Data) AllCols() map[string][]interface{} {
+	return d.dt
+}
+
+//AllRows returns all row in an array
+func (d *Data) AllRows() []map[string]interface{} {
+	var len int
+	len = d.Rows()
+	var res []map[string]interface{}
+	for i := 0; i < len; i++ {
+		res = append(res, d.Row(i).dt)
+	}
+	return res
+}
+
 // Row return the ith row from data
 func (d *Data) Row(i int) Row {
 	oneRow := Row{make(map[string]interface{}, d.Rows())}

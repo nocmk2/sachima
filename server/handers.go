@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/nocmk2/sachima/dur"
+
 	"github.com/nocmk2/sachima/pass"
 	"github.com/nocmk2/sachima/server/component"
 
@@ -157,4 +159,9 @@ func adduserHandler(c *gin.Context) {
 	db.Create(&new)
 
 	c.JSON(http.StatusOK, gin.H{"status": hash})
+}
+
+func getRolesHandler(c *gin.Context) {
+	d := dur.ReadSQL("select * from roles", "sachima_local")
+	c.JSON(http.StatusOK, d.AllRows())
 }

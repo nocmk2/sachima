@@ -51,7 +51,7 @@ func comparePasswords(hashedPwd string, plainPwd []byte) bool {
 	return true
 }
 
-func main() {
+func main19() {
 	for {
 		// Enter a password and generate a salted hash
 		pwd := getPwd()
