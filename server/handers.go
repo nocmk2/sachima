@@ -155,7 +155,7 @@ func adduserHandler(c *gin.Context) {
 
 	hash := pass.HashAndSalt([]byte(user.Password))
 
-	new := User{UserName: user.UserName, Password: hash, Email: user.Email}
+	new := User{UserName: user.UserName, Password: hash, Email: user.Email, FirstName: user.FirstName, LastName: user.LastName}
 	db.Create(&new)
 
 	c.JSON(http.StatusOK, gin.H{"status": hash})

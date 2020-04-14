@@ -26,12 +26,23 @@ Authorization: Bearer {{token}}
 content-type: application/json
 
 {
-    "username": "jerry",
-    "password": "88887777",
-    "email":"john@sachima.com"
+    "username": "admin",
+    "password": "123456",
+    "email":"admin@sachima.com",
+    "firstname":"管理员",
+    "lastname":"管理员"
 }
 
+# const mock_users = [
+#     { id: 'wanghaoran', name: "王浩然" },
+#     { id: 'duanyu', name: "段誉" },
+#     { id: 'wangyuyan', name: "王语嫣" },
+#     { id: 'xuzhu', name: "虚竹" },
+#     { id: 'wanglihong', name: "王力宏" },
+#     { id: 'admin', name: '管理员' }
+# ]
+
 ### get roles
-POST {{baseUrl}}/sachima/getroles HTTP/1.1
+GET {{baseUrl}}/sachima/getroles HTTP/1.1
 Authorization: Bearer {{token}} 
 content-type: application/json
