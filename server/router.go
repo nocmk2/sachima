@@ -39,5 +39,6 @@ func router(r *gin.Engine, au *jwt.GinJWTMiddleware) {
 		sachima.POST("/adduser", Casbin("config", "write", adapter), adduserHandler)
 		sachima.GET("/getusers", Casbin("config", "write", adapter), getUsersHandler)
 		sachima.GET("/getroles", Casbin("config", "write", adapter), getRolesHandler)
+		sachima.GET("getobjects", Casbin("config", "write", adapter), getObjectsHandler)
 	}
 }

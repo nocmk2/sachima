@@ -170,3 +170,8 @@ func getUsersHandler(c *gin.Context) {
 	d := dur.ReadSQL("select user_name as id,first_name as name from users", "sachima_local")
 	c.JSON(http.StatusOK, d.AllRows())
 }
+
+func getObjectsHandler(c *gin.Context) {
+	d := dur.ReadSQL("select * from objects", "sachima_local")
+	c.JSON(http.StatusOK, d.AllRows())
+}
