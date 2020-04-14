@@ -165,3 +165,8 @@ func getRolesHandler(c *gin.Context) {
 	d := dur.ReadSQL("select * from roles", "sachima_local")
 	c.JSON(http.StatusOK, d.AllRows())
 }
+
+func getUsersHandler(c *gin.Context) {
+	d := dur.ReadSQL("select user_name as id,first_name as name from users", "sachima_local")
+	c.JSON(http.StatusOK, d.AllRows())
+}

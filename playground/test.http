@@ -46,3 +46,8 @@ content-type: application/json
 GET {{baseUrl}}/sachima/getroles HTTP/1.1
 Authorization: Bearer {{token}} 
 content-type: application/json
+
+### get users
+GET {{baseUrl}}/sachima/getusers HTTP/1.1
+Authorization: Bearer {{token}} 
+content-type: application/json
