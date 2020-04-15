@@ -175,3 +175,13 @@ func getObjectsHandler(c *gin.Context) {
 	d := dur.ReadSQL("select * from objects", "sachima_local")
 	c.JSON(http.StatusOK, d.AllRows())
 }
+func getUserRoleHandler(c *gin.Context) {
+	// 	select v0 as role,v1 as obj,v2 as action from casbin_rule where p_type='p';
+
+	d := dur.ReadSQL("select v0 as user,v1 as role from casbin_rule where p_type='g'", "sachima_local")
+	c.JSON(http.StatusOK, d.AllRows())
+}
+func getRoleObjectHandler(c *gin.Context) {
+	d := dur.ReadSQL("select v0 as role,v1 as obj,v2 as action from casbin_rule where p_type='p'", "sachima_local")
+	c.JSON(http.StatusOK, d.AllRows())
+}

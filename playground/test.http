@@ -51,3 +51,14 @@ content-type: application/json
 GET {{baseUrl}}/sachima/getusers HTTP/1.1
 Authorization: Bearer {{token}} 
 content-type: application/json
+
+
+### get userrole
+GET {{baseUrl}}/sachima/getuserrole HTTP/1.1
+Authorization: Bearer {{token}} 
+content-type: application/json
+
+### get role
+GET {{baseUrl}}/sachima/getroleobject HTTP/1.1
+Authorization: Bearer {{token}} 
+content-type: application/json
