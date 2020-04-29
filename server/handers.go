@@ -118,15 +118,21 @@ func featurelistsHandler(c *gin.Context) {
 
 func featuresHandler(c *gin.Context) {
 	// f := featurelists()
-	f := featureRaw()
-	claims := jwt.ExtractClaims(c)
-	user, _ := c.Get(identityKey)
+	features := featureRaw()
+	// claims := jwt.ExtractClaims(c)
+	// user, _ := c.Get(identityKey)
 
-	c.JSON(200, gin.H{
-		"userID":   claims[identityKey],
-		"userName": user.(*User).UserName,
-		"features": f,
-	})
+	// c.JSON(200, gin.H{
+	// 	"userID":   claims[identityKey],
+	// 	"userName": user.(*User).UserName,
+	// 	"features": f,
+	// })
+	c.JSON(http.StatusOK, features)
+}
+
+func rulesHandler(c *gin.Context) {
+	d := dur.ReadSQL("select name,version from risk_rules", "sachima_local")
+	c.JSON(http.StatusOK, d.AllRows())
 }
 
 func featuredetailHandler(c *gin.Context) {

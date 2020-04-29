@@ -16,6 +16,10 @@ content-type: application/json
 GET {{baseUrl}}/sachima/features HTTP/1.1
 Authorization: Bearer {{token}} 
 
+### get rules 
+GET {{baseUrl}}/sachima/rules HTTP/1.1
+Authorization: Bearer {{token}} 
+
 ### test casbin  
 GET {{baseUrl}}/sachima/hello HTTP/1.1
 Authorization: Bearer {{token}} 
