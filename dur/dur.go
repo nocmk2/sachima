@@ -223,11 +223,11 @@ func (r Row) Col(name string) string {
 }
 
 //ReadSQL from db
-func ReadSQL(sqlstr string, con string) Data {
+func ReadSQL(con string, sqlstr string, args ...interface{}) Data {
 	// https://github.com/go-sql-driver/mysql/wiki/Examples
 	db := readDBConfig(con)
 	defer db.Close()
-	rows, err := db.Query(sqlstr)
+	rows, err := db.Query(sqlstr, args...)
 	if err != nil {
 		log.Fatal(err)
 	}

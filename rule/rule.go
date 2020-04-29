@@ -331,7 +331,7 @@ func parse() {
 	rule1 := Rule{rulePath: jsonPath}
 	rule1.lazyInit()
 	log.Println(rule1.srcsql)
-	d := dur.ReadSQL(rule1.srcsql, "hawaii")
+	d := dur.ReadSQL("hawaii", rule1.srcsql)
 	log.Println(d.Rows())
 	// d.Add(scores, "dxscore")
 	rule1.cal(d)

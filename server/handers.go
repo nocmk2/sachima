@@ -117,6 +117,10 @@ func featurelistsHandler(c *gin.Context) {
 }
 
 func featuresHandler(c *gin.Context) {
+	name := c.Param("name")
+	version := c.Param("version")
+	d := dur.ReadSQL("sachima_local", "select rule from risk_rules where name=? and version=?", name, version)
+	c.JSON(http.StatusOK, d.AllRows())
 	// f := featurelists()
 	features := featureRaw()
 	// claims := jwt.ExtractClaims(c)
@@ -130,24 +134,24 @@ func featuresHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, features)
 }
 
-func rulesHandler(c *gin.Context) {
-	d := dur.ReadSQL("select name,version from risk_rules", "sachima_local")
-	c.JSON(http.StatusOK, d.AllRows())
-}
-
 func featuredetailHandler(c *gin.Context) {
 	fname := c.Param("feature")
 	bin := featureBin(fname)
 	cname := featureName(fname)
-	claims := jwt.ExtractClaims(c)
-	user, _ := c.Get(identityKey)
+	// claims := jwt.ExtractClaims(c)
+	// user, _ := c.Get(identityKey)
 
 	c.JSON(200, gin.H{
-		"userID":   claims[identityKey],
-		"userName": user.(*User).UserName,
-		"name":     cname,
-		"bin":      bin,
+		// "userID":   claims[identityKey],
+		// "userName": user.(*User).UserName,
+		"name": cname,
+		"bin":  bin,
 	})
+}
+
+func rulesHandler(c *gin.Context) {
+	d := dur.ReadSQL("sachima_local", "select name,version from risk_rules")
+	c.JSON(http.StatusOK, d.AllRows())
 }
 
 func adduserHandler(c *gin.Context) {
@@ -168,26 +172,26 @@ func adduserHandler(c *gin.Context) {
 }
 
 func getRolesHandler(c *gin.Context) {
-	d := dur.ReadSQL("select * from roles", "sachima_local")
+	d := dur.ReadSQL("sachima_local", "select * from roles")
 	c.JSON(http.StatusOK, d.AllRows())
 }
 
 func getUsersHandler(c *gin.Context) {
-	d := dur.ReadSQL("select user_name as id,first_name as name from users", "sachima_local")
+	d := dur.ReadSQL("sachima_local", "select user_name as id,first_name as name from users")
 	c.JSON(http.StatusOK, d.AllRows())
 }
 
 func getObjectsHandler(c *gin.Context) {
-	d := dur.ReadSQL("select * from objects", "sachima_local")
+	d := dur.ReadSQL("sachima_local", "select * from objects")
 	c.JSON(http.StatusOK, d.AllRows())
 }
 func getUserRoleHandler(c *gin.Context) {
 	// 	select v0 as role,v1 as obj,v2 as action from casbin_rule where p_type='p';
 
-	d := dur.ReadSQL("select v0 as user,v1 as role from casbin_rule where p_type='g'", "sachima_local")
+	d := dur.ReadSQL("sachima_local", "select v0 as user,v1 as role from casbin_rule where p_type='g'")
 	c.JSON(http.StatusOK, d.AllRows())
 }
 func getRoleObjectHandler(c *gin.Context) {
-	d := dur.ReadSQL("select v0 as role,v1 as obj,v2 as action from casbin_rule where p_type='p'", "sachima_local")
+	d := dur.ReadSQL("sachima_local", "select v0 as role,v1 as obj,v2 as action from casbin_rule where p_type='p'")
 	c.JSON(http.StatusOK, d.AllRows())
 }

@@ -1,98 +1,104 @@
 package main
 
-import (
-	"fmt"
-	"log"
-	"net/http"
-	"strings"
+import "fmt"
 
-	"github.com/gin-gonic/gin"
-)
+// func Capitalize(name string) string {
+// 	return strings.ToUpper(name)
+// }
 
-func Capitalize(name string) string {
-	return strings.ToUpper(name)
+func a(x int, y ...int) {
+	fmt.Println(x, y)
+	// for _, v := range y {
+	// 	print(v)
+	// }
 }
 
-func main1() {
-	r := gin.Default()
+func b(x int) {
+	fmt.Println(x)
+}
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "pong"})
-	})
+func main() {
+	a(10)
+	// b(19)
+	// r := gin.Default()
 
-	r.GET("/hello/:name", func(c *gin.Context) {
-		name := c.Param("name")
-		c.String(http.StatusOK, "Hello %s", name)
-	})
+	// r.GET("/ping", func(c *gin.Context) {
+	// 	c.JSON(200, gin.H{"message": "pong"})
+	// })
 
-	r.GET("/hello/:name/*title", func(c *gin.Context) {
-		name := c.Param("name")
-		title := c.Param("title")
-		log.Println(title)
-		message := title + " " + Capitalize(name)
-		c.String(http.StatusOK, message)
-	})
+	// r.GET("/hello/:name", func(c *gin.Context) {
+	// 	name := c.Param("name")
+	// 	c.String(http.StatusOK, "Hello %s", name)
+	// })
 
-	r.GET("/user/:name/*action", func(c *gin.Context) {
-		name := c.Param("name")
-		action := c.Param("action")
-		message := name + " is " + action
-		c.String(http.StatusOK, message+" "+c.FullPath())
-	})
+	// r.GET("/hello/:name/*title", func(c *gin.Context) {
+	// 	name := c.Param("name")
+	// 	title := c.Param("title")
+	// 	log.Println(title)
+	// 	message := title + " " + Capitalize(name)
+	// 	c.String(http.StatusOK, message)
+	// })
 
-	// Querystring parameters
-	r.GET("/welcome", func(c *gin.Context) {
-		firstname := c.DefaultQuery("firstname", "Guest")
-		lastname := c.Query("lastname")
+	// r.GET("/user/:name/*action", func(c *gin.Context) {
+	// 	name := c.Param("name")
+	// 	action := c.Param("action")
+	// 	message := name + " is " + action
+	// 	c.String(http.StatusOK, message+" "+c.FullPath())
+	// })
 
-		c.String(http.StatusOK, "Hello %s %s", firstname, lastname)
-	})
+	// // Querystring parameters
+	// r.GET("/welcome", func(c *gin.Context) {
+	// 	firstname := c.DefaultQuery("firstname", "Guest")
+	// 	lastname := c.Query("lastname")
 
-	// Multipart/Urlencoded Form
-	r.POST("/form_post", func(c *gin.Context) {
-		message := c.PostForm("message")
-		nick := c.DefaultPostForm("nick", "anonymous")
+	// 	c.String(http.StatusOK, "Hello %s %s", firstname, lastname)
+	// })
 
-		c.JSON(200, gin.H{
-			"status":  "posted",
-			"message": message,
-			"nick":    nick,
-		})
-	})
+	// // Multipart/Urlencoded Form
+	// r.POST("/form_post", func(c *gin.Context) {
+	// 	message := c.PostForm("message")
+	// 	nick := c.DefaultPostForm("nick", "anonymous")
 
-	//Another example: query + post form
-	r.POST("/post", func(c *gin.Context) {
-		id := c.Query("id")
-		page := c.DefaultQuery("page", "0")
-		name := c.PostForm("name")
-		message := c.PostForm("message")
-		c.String(http.StatusOK, "id: %s; page: %s; name: %s; message: %s", id, page, name, message)
-		log.Printf("id: %s; page: %s; name: %s; message: %s", id, page, name, message)
-	})
+	// 	c.JSON(200, gin.H{
+	// 		"status":  "posted",
+	// 		"message": message,
+	// 		"nick":    nick,
+	// 	})
+	// })
 
-	//Map as querystring or postform parameters
-	r.POST("/postmap", func(c *gin.Context) {
+	// //Another example: query + post form
+	// r.POST("/post", func(c *gin.Context) {
+	// 	id := c.Query("id")
+	// 	page := c.DefaultQuery("page", "0")
+	// 	name := c.PostForm("name")
+	// 	message := c.PostForm("message")
+	// 	c.String(http.StatusOK, "id: %s; page: %s; name: %s; message: %s", id, page, name, message)
+	// 	log.Printf("id: %s; page: %s; name: %s; message: %s", id, page, name, message)
+	// })
 
-		ids := c.QueryMap("ids")
-		names := c.PostFormMap("names")
+	// //Map as querystring or postform parameters
+	// r.POST("/postmap", func(c *gin.Context) {
 
-		fmt.Printf("ids: %v; names: %v", ids, names)
-	})
+	// 	ids := c.QueryMap("ids")
+	// 	names := c.PostFormMap("names")
 
-	// upload file
-	/*
-	 	curl -X POST http://localhost:8080/upload \
-	   -F "file=@/Users/appleboy/test.zip" \
-	   -H "Content-Type: multipart/form-data"
-	*/
-	r.POST("/upload", func(c *gin.Context) {
-		file, _ := c.FormFile("file")
-		log.Println(file.Filename)
-		// Upload the file to specific dst.
-		// c.SaveUploadedFile(file, dst)
+	// 	fmt.Printf("ids: %v; names: %v", ids, names)
+	// })
 
-		c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
-	})
+	// // upload file
+	// /*
+	//  	curl -X POST http://localhost:8080/upload \
+	//    -F "file=@/Users/appleboy/test.zip" \
+	//    -H "Content-Type: multipart/form-data"
+	// */
+	// r.POST("/upload", func(c *gin.Context) {
+	// 	file, _ := c.FormFile("file")
+	// 	log.Println(file.Filename)
+	// 	// Upload the file to specific dst.
+	// 	// c.SaveUploadedFile(file, dst)
 
-	r.Run()
+	// 	c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
+	// })
+
+	// r.Run()
 }

@@ -34,7 +34,8 @@ func router(r *gin.Engine, au *jwt.GinJWTMiddleware) {
 		sachima.GET("/role", roleHandler)
 		sachima.GET("/signup", signupHandler)
 		sachima.GET("/featurelists", featurelistsHandler)
-		sachima.GET("/features", featuresHandler)
+		sachima.GET("/rules", rulesHandler)
+		sachima.GET("/rule/:name/:version/features", featuresHandler)
 		sachima.GET("/featuredetail/:feature", featuredetailHandler)
 		sachima.POST("/adduser", Casbin("config", "write", adapter), adduserHandler)
 		sachima.GET("/getusers", Casbin("config", "write", adapter), getUsersHandler)
@@ -42,6 +43,5 @@ func router(r *gin.Engine, au *jwt.GinJWTMiddleware) {
 		sachima.GET("/getobjects", Casbin("config", "write", adapter), getObjectsHandler)
 		sachima.GET("/getuserrole", Casbin("config", "write", adapter), getUserRoleHandler)
 		sachima.GET("/getroleobject", Casbin("config", "write", adapter), getRoleObjectHandler)
-		sachima.GET("/rules", rulesHandler)
 	}
 }
