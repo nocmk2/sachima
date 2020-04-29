@@ -13,7 +13,7 @@ content-type: application/json
 @token = {{login.response.body.token}}
 
 ### get features 
-GET {{baseUrl}}/sachima/features HTTP/1.1
+GET {{baseUrl}}/sachima/rule/商户评分卡/v0.1 HTTP/1.1
 Authorization: Bearer {{token}} 
 
 ### get rules 
@@ -66,3 +66,4 @@ content-type: application/json
 GET {{baseUrl}}/sachima/getroleobject HTTP/1.1
 Authorization: Bearer {{token}} 
 content-type: application/json
+

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -116,13 +117,14 @@ func featurelistsHandler(c *gin.Context) {
 	})
 }
 
-func featuresHandler(c *gin.Context) {
+func ruleHandler(c *gin.Context) {
 	name := c.Param("name")
 	version := c.Param("version")
 	d := dur.ReadSQL("sachima_local", "select rule from risk_rules where name=? and version=?", name, version)
-	c.JSON(http.StatusOK, d.AllRows())
+	log.Println(d.AllRows()[0])
+	c.JSON(http.StatusOK, d.AllRows()[0])
 	// f := featurelists()
-	features := featureRaw()
+	// features := featureRaw()
 	// claims := jwt.ExtractClaims(c)
 	// user, _ := c.Get(identityKey)
 
@@ -131,7 +133,7 @@ func featuresHandler(c *gin.Context) {
 	// 	"userName": user.(*User).UserName,
 	// 	"features": f,
 	// })
-	c.JSON(http.StatusOK, features)
+	// c.JSON(http.StatusOK, features)
 }
 
 func featuredetailHandler(c *gin.Context) {
