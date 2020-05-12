@@ -120,7 +120,7 @@ func featurelistsHandler(c *gin.Context) {
 func ruleHandler(c *gin.Context) {
 	name := c.Param("name")
 	version := c.Param("version")
-	d := dur.ReadSQL("sachima_local", "select rule from risk_rules where name=? and version=?", name, version)
+	d := dur.ReadSQL("sachima_local", "select name,version,rule,comment from risk_rules where name=? and version=?", name, version)
 	log.Println(d.AllRows()[0])
 	c.JSON(http.StatusOK, d.AllRows()[0])
 	// f := featurelists()
