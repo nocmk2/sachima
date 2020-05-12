@@ -122,7 +122,7 @@ func ruleHandler(c *gin.Context) {
 	version := c.Param("version")
 	d := dur.ReadSQL("sachima_local", "select rule from risk_rules where name=? and version=?", name, version)
 	log.Println(d.AllRows()[0])
-	c.JSON(http.StatusOK, d.AllRows()[0]["rule"])
+	c.JSON(http.StatusOK, d.AllRows()[0])
 	// f := featurelists()
 	// features := featureRaw()
 	// claims := jwt.ExtractClaims(c)
