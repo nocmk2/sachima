@@ -1,7 +1,7 @@
 #sachima
 
 
-
+mkdir data && touch db.json
 ``` javascript
 {
     "localmysql8": {
