@@ -118,7 +118,7 @@ func Casbin(obj string, act string, adapter *gormadapter.Adapter) gin.HandlerFun
 
 func enforce(sub string, obj string, act string, adapter *gormadapter.Adapter) (bool, error) {
 	// Load model configuration file and policy store adapter
-	enforcer := casbin.NewEnforcer("data/rbac.conf", adapter)
+	enforcer := casbin.NewEnforcer("conf/rbac.conf", adapter)
 	err := enforcer.LoadPolicy()
 	if err != nil {
 		return false, fmt.Errorf("failed to load policy from DB: %w", err)
