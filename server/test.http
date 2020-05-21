@@ -62,6 +62,11 @@ GET {{baseUrl}}/sachima/getuserrole HTTP/1.1
 Authorization: Bearer {{token}} 
 content-type: application/json
 
+### get objects 
+GET {{baseUrl}}/sachima/getobjects HTTP/1.1
+Authorization: Bearer {{token}} 
+content-type: application/json
+
 ### get role
 GET {{baseUrl}}/sachima/getroleobject HTTP/1.1
 Authorization: Bearer {{token}} 
