@@ -121,7 +121,7 @@ func ruleHandler(c *gin.Context) {
 	name := c.Param("name")
 	version := c.Param("version")
 	d := dur.ReadSQL("sachima_local", "select name,version,rule,comment from risk_rules where name=? and version=?", name, version)
-	log.Println(d.AllRows()[0])
+	// log.Println(d.AllRows()[0])
 	c.JSON(http.StatusOK, d.AllRows()[0])
 	// f := featurelists()
 	// features := featureRaw()
@@ -176,6 +176,25 @@ func adduserHandler(c *gin.Context) {
 func getRolesHandler(c *gin.Context) {
 	d := dur.ReadSQL("sachima_local", "select * from roles")
 	c.JSON(http.StatusOK, d.AllRows())
+}
+
+func getUserByIDHandler(c *gin.Context) {
+	id := c.Param("ID")
+	d := dur.ReadSQL("sachima_local", "select * from users where user_name=?", id)
+	c.JSON(http.StatusOK, d.AllRows()[0])
+}
+
+func getRoleByIDHandler(c *gin.Context) {
+	id := c.Param("ID")
+	log.Println(id)
+	d := dur.ReadSQL("sachima_local", "select * from roles where id=?", id)
+	c.JSON(http.StatusOK, d.AllRows()[0])
+}
+
+func getObjectByIDHandler(c *gin.Context) {
+	id := c.Param("ID")
+	d := dur.ReadSQL("sachima_local", "select * from objects where id=?", id)
+	c.JSON(http.StatusOK, d.AllRows()[0])
 }
 
 func getUsersHandler(c *gin.Context) {
