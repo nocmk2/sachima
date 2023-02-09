@@ -8,10 +8,9 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/appleboy/gin-jwt/v2 v2.6.2
 	github.com/casbin/casbin v1.9.1
-	github.com/casbin/casbin/v2 v2.2.2
 	github.com/casbin/gorm-adapter v1.0.0
 	github.com/gin-contrib/cors v1.3.0
-	github.com/gin-gonic/gin v1.5.0
+	github.com/gin-gonic/gin v1.7.7
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/jinzhu/gorm v1.9.12
 	github.com/lib/pq v1.3.0 // indirect
@@ -21,5 +20,5 @@ require (
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.4.0
 	github.com/tidwall/gjson v1.3.2
-	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
+	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 )
